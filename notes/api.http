@@ -1,0 +1,22 @@
+### Create note
+POST https://9ex1bjxnhj.execute-api.us-east-1.amazonaws.com/dev/notes
+Content-Type: application/json
+
+{
+}
+
+
+### Update note
+PUT https://9ex1bjxnhj.execute-api.us-east-1.amazonaws.com/dev/notes/99
+Content-Type: application/json
+
+{
+}
+
+
+### Delete note
+DELETE https://9ex1bjxnhj.execute-api.us-east-1.amazonaws.com/dev/notes/99
+
+
+### Get all notes
+GET https://9ex1bjxnhj.execute-api.us-east-1.amazonaws.com/dev/notes
