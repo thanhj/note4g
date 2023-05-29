@@ -12,6 +12,7 @@ const send = (statusCode, data, callback) => {
 };
 
 module.exports.createNote = async (event, context, callback) => {
+  context.callbackWaitsForEmptyEventLoop = false;
   try {
     let data = JSON.parse(event.body);
     let params = {
@@ -32,6 +33,7 @@ module.exports.createNote = async (event, context, callback) => {
 };
 
 module.exports.updateNote = async (event, context, callback) => {
+  context.callbackWaitsForEmptyEventLoop = false;
   let notesId = event.pathParameters.id;
   
   try {
@@ -62,6 +64,7 @@ module.exports.updateNote = async (event, context, callback) => {
 };
 
 module.exports.deleteNote = async (event, context, callback) => {
+  context.callbackWaitsForEmptyEventLoop = false;
   let noteId = event.pathParameters.id;
   try {
     const params = {
@@ -80,12 +83,13 @@ module.exports.deleteNote = async (event, context, callback) => {
 };
 
 module.exports.getAllNotes = async (event, context, callback) => {
+  context.callbackWaitsForEmptyEventLoop = false;
   try {
     const params = {
       TableName: NOTES_TABLE_NAME
     };
     const data = await documentClient.scan(params).promise();
-    send(200, data.Items, callback);
+    send(200, data, callback);
   } catch (err) {
     console.log(err);
     send(500, err, callback);

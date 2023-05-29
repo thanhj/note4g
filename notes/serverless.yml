@@ -6,6 +6,9 @@ provider:
   runtime: nodejs18.x
   stage: dev
   region: us-east-1
+  environment:
+    NOTES_TABLE_NAME: !Ref notesTable
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
 
 plugins:
   - serverless-iam-roles-per-function
@@ -13,8 +16,6 @@ plugins:
 functions:
   createNote:
     handler: handler.createNote
-    environment:
-      NOTES_TABLE_NAME: !Ref notesTable
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -27,8 +28,6 @@ functions:
   
   updateNote:
     handler: handler.updateNote
-    environment:
-      NOTES_TABLE_NAME: !Ref notesTable
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -41,8 +40,6 @@ functions:
 
   deleteNote:
     handler: handler.deleteNote
-    environment:
-      NOTES_TABLE_NAME: !Ref notesTable
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -55,8 +52,6 @@ functions:
 
   getAllNotes:
     handler: handler.getAllNotes
-    environment:
-      NOTES_TABLE_NAME: !Ref notesTable
     iamRoleStatements:
       - Effect: Allow
         Action:
