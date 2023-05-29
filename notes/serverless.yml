@@ -7,9 +7,19 @@ provider:
   stage: dev
   region: us-east-1
 
+plugins:
+  - serverless-iam-roles-per-function
+
 functions:
   createNote:
     handler: handler.createNote
+    environment:
+      NOTES_TABLE_NAME: !Ref notesTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource: !GetAtt notesTable.Arn
     events:
       - http:
           method: post
@@ -17,6 +27,13 @@ functions:
   
   updateNote:
     handler: handler.updateNote
+    environment:
+      NOTES_TABLE_NAME: !Ref notesTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: !GetAtt notesTable.Arn
     events:
       - http:
           method: put
@@ -24,6 +41,13 @@ functions:
 
   deleteNote:
     handler: handler.deleteNote
+    environment:
+      NOTES_TABLE_NAME: !Ref notesTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:DeleteItem
+        Resource: !GetAtt notesTable.Arn
     events:
       - http:
           method: delete
@@ -31,6 +55,13 @@ functions:
 
   getAllNotes:
     handler: handler.getAllNotes
+    environment:
+      NOTES_TABLE_NAME: !Ref notesTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Scan
+        Resource: !GetAtt notesTable.Arn
     events:
       - http:
           method: get
@@ -38,7 +69,7 @@ functions:
 
 resources:
   Resources:
-    noteTable:
+    notesTable:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: notes
@@ -50,7 +81,8 @@ resources:
           - AttributeName: notesId
             KeyType: HASH
 
-      
+# plugins:
+  # aem-rol
 
 # you can add CloudFormation resource templates here
 #resources:

@@ -1,22 +1,27 @@
 ### Create note
-POST https://9ex1bjxnhj.execute-api.us-east-1.amazonaws.com/dev/notes
+POST https://hfygtvr139.execute-api.us-east-1.amazonaws.com/dev/notes
 Content-Type: application/json
 
 {
+    "id": "100",
+    "title": "my first note",
+    "content": "Hello world!"
 }
 
 
 ### Update note
-PUT https://9ex1bjxnhj.execute-api.us-east-1.amazonaws.com/dev/notes/99
+PUT https://hfygtvr139.execute-api.us-east-1.amazonaws.com/dev/notes/100
 Content-Type: application/json
 
 {
+    "title": "Update title",
+    "content": "Hello again!"
 }
 
 
 ### Delete note
-DELETE https://9ex1bjxnhj.execute-api.us-east-1.amazonaws.com/dev/notes/99
+DELETE https://hfygtvr139.execute-api.us-east-1.amazonaws.com/dev/notes/100
 
 
 ### Get all notes
-GET https://9ex1bjxnhj.execute-api.us-east-1.amazonaws.com/dev/notes
+GET https://hfygtvr139.execute-api.us-east-1.amazonaws.com/dev/notes
