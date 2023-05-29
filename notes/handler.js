@@ -1,6 +1,12 @@
 'use strict';
 const DynamoDB = require('aws-sdk/clients/dynamodb');
-const documentClient = new DynamoDB.DocumentClient({ region: 'us-east-1'});
+const documentClient = new DynamoDB.DocumentClient({ 
+  region: 'us-east-1',
+  maxRetries: 3,
+  httpOptions: {
+    timeout: 5000
+  }
+});
 const NOTES_TABLE_NAME = process.env.NOTES_TABLE_NAME;
 
 const send = (statusCode, data, callback) => {
