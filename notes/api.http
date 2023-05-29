@@ -3,7 +3,7 @@ POST https://hfygtvr139.execute-api.us-east-1.amazonaws.com/dev/notes
 Content-Type: application/json
 
 {
-    "id": "101",
+    "id": "100",
     "title": "my first note",
     "content": "Hello world!"
 }

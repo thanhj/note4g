@@ -1,45 +1,47 @@
 'use strict';
-const DynamoDB = require('aws-sdk/clients/dynamodb');
-const documentClient = new DynamoDB.DocumentClient({ 
-  region: 'us-east-1',
-  maxRetries: 3,
-  httpOptions: {
-    timeout: 5000
-  }
-});
+
+const {
+  DynamoDBClient, 
+  PutItemCommand,
+  UpdateItemCommand,
+  DeleteItemCommand,
+  ScanCommand
+} = require('@aws-sdk/client-dynamodb');
+
+const client = new DynamoDBClient({ region: 'us-east-1' });
+
 const NOTES_TABLE_NAME = process.env.NOTES_TABLE_NAME;
 
-const send = (statusCode, data, callback) => {
-  const response = {
+const send = (statusCode, data) => {
+  return {
     statusCode: statusCode,
     body: JSON.stringify(data)
   };
-  callback(null, response);
 };
 
-module.exports.createNote = async (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
+module.exports.createNote = async (event) => {
+
   try {
     let data = JSON.parse(event.body);
     let params = {
       TableName: NOTES_TABLE_NAME,
       Item: {
-        notesId: data.id,
-        title: data.title,
-        content: data.content
+        notesId: { S: data.id},
+        title: { S: data.title},
+        content: { S: data.content}
       },
       ConditionExpression: 'attribute_not_exists(notesId)'
     };
-    await documentClient.put(params).promise();
-    send(201, data, callback);
+    const response = await client.send(new PutItemCommand(params));
+
+    return send(200, response);
   } catch (err) {
     console.log(err);
-    send(500, err, callback);
+    return send(500, err);
   }
 };
 
-module.exports.updateNote = async (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
+module.exports.updateNote = async (event) => {
   let notesId = event.pathParameters.id;
   
   try {
@@ -47,7 +49,7 @@ module.exports.updateNote = async (event, context, callback) => {
     const params = {
       TableName: NOTES_TABLE_NAME,
       Key: {
-        notesId: notesId
+        notesId: { S: notesId}
       },
       UpdateExpression: 'set #title = :title, #content = :content',
       ExpressionAttributeNames: {
@@ -55,49 +57,47 @@ module.exports.updateNote = async (event, context, callback) => {
         '#content': 'content'
       },
       ExpressionAttributeValues: {
-        ':title': data.title,
-        ':content': data.content
+        ':title': { S: data.title},
+        ':content': { S: data.content}
       },
       ConditionExpression: 'attribute_exists(notesId)',
       ReturnValues: 'UPDATED_NEW'
     };
-    await documentClient.update(params).promise();
-    send(200, data, callback);
+    const response = await client.send(new UpdateItemCommand(params));
+    return send(200, response);
   } catch (err) {
     console.log(err);
-    send(500, err, callback);
+    return send(500, err);
   }
 };
 
-module.exports.deleteNote = async (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
+module.exports.deleteNote = async (event) => {
   let noteId = event.pathParameters.id;
   try {
     const params = {
       TableName: NOTES_TABLE_NAME,
       Key: {
-        notesId: noteId
+        notesId: { S: noteId}
       },
       ConditionExpression: 'attribute_exists(notesId)'
     };
-    await documentClient.delete(params).promise();
-    send(200, 'Note is deleted!', callback);
+    const response = await client.send(new DeleteItemCommand(params));
+    return send(200, response);
   } catch (err) {
     console.log(err);
-    send(500, err, callback);
+    return send(500, err);
   }
 };
 
-module.exports.getAllNotes = async (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
+module.exports.getAllNotes = async (event) => {
   try {
     const params = {
       TableName: NOTES_TABLE_NAME
     };
-    const data = await documentClient.scan(params).promise();
-    send(200, data, callback);
+    const response = await client.send(new ScanCommand(params));
+    return send(200, response);
   } catch (err) {
     console.log(err);
-    send(500, err, callback);
+    return send(500, err);
   }
 };
