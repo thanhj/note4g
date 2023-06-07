@@ -11,7 +11,7 @@ phases:
       - cd notes
       - echo "Install npm dependencies of notes service"
       - npm install
-  deploy:
+  build:
     on-failure: ABORT
     commands:
       - echo Deploying resources
