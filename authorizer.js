@@ -11,7 +11,6 @@ const jwtVerifier = CognitoJwtVerifier.create({
 });
 
 const generatePolicy = (principalId, effect, resource) => {
-
     var authResponse = {};
     authResponse.principalId = principalId;
     if (effect && resource) {
@@ -37,12 +36,18 @@ const generatePolicy = (principalId, effect, resource) => {
 exports.handler = async (event, context, callback) => {
 
     // lambda authorizer code goes here
-    var token = event.authorizationToken; // "allow" or "deny"
+    var token = event.authorizationToken;
+    // arn:aws:execute-api:us-east-1:827726978788:86heudi5f6/*/POST/notes
+
+    var tmp = event.methodArn.split(':');
+    var apiGatewayArnTmp = tmp[5].split('/');
+    var genericResource = tmp[0] + ':' + tmp[1] + ':' + tmp[2] + ':' + tmp[3] + ':' + tmp[4] + ':' + apiGatewayArnTmp[0] + '/*/*';
+    console.log(genericResource);
     console.log(token);
     try {
         const payload = await jwtVerifier.verify(token);
         console.log(payload);
-        callback(null, generatePolicy(payload.username, 'Allow', event.methodArn));
+        callback(null, generatePolicy(payload.username, 'Allow', genericResource));
     } catch (err) {
         console.log(err);
         callback('Unauthorized');
