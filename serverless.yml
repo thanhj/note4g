@@ -70,13 +70,11 @@ functions:
       - http:
           method: get
           path: notes
-          # authorizer:
-          #   arn: !GetAtt cognitoUserPool.Arn
-          #   name: userpool_authorizer
-          #   type: COGNITO_USER_POOLS
+          authorizer:
+            arn: !GetAtt cognitoUserPool.Arn
+            name: userpool_authorizer
+            type: COGNITO_USER_POOLS
 
 resources:
   Resources:
     ${file(resources.yml)}
-    
-    
