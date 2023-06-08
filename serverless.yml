@@ -31,7 +31,10 @@ functions:
       - http:
           method: post
           path: notes
-          authorizer: authorizer
+          authorizer:
+            arn: !GetAtt cognitoUserPool.Arn
+            name: userpool_authorizer
+            type: COGNITO_USER_POOLS
   
   updateNote:
     handler: handler.updateNote
@@ -44,7 +47,10 @@ functions:
       - http:
           method: put
           path: notes/{id}
-          authorizer: authorizer
+          authorizer:
+            arn: !GetAtt cognitoUserPool.Arn
+            name: userpool_authorizer
+            type: COGNITO_USER_POOLS
 
   deleteNote:
     handler: handler.deleteNote
@@ -57,7 +63,10 @@ functions:
       - http:
           method: delete
           path: notes/{id}
-          authorizer: authorizer
+          authorizer:
+            arn: !GetAtt cognitoUserPool.Arn
+            name: userpool_authorizer
+            type: COGNITO_USER_POOLS
 
   getAllNotes:
     handler: handler.getAllNotes

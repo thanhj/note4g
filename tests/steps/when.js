@@ -37,3 +37,13 @@ exports.we_invoke_create_a_note = (options) => {
     let response = makeHttpRequest('POST', 'notes', options);
     return response;
 };
+
+exports.we_invoke_update_note = (options) => {
+    let response = makeHttpRequest('PUT', `notes/${options.noteId}`, options);
+    return response;
+}
+
+exports.we_invoke_delete_note = (options) => {
+    let response = makeHttpRequest('DELETE', `notes/${options.noteId}`, options);
+    return response;
+}

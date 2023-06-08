@@ -21,6 +21,6 @@ exports.an_authenticated_user = async () => {
     };
 
     let user = await cognito.adminInitiateAuth(params).promise();
-
+    
     return user;
 };
