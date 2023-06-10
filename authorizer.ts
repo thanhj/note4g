@@ -1,17 +1,23 @@
-const { CognitoJwtVerifier } = require('aws-jwt-verify');
+import { APIGatewayTokenAuthorizerEvent, Context, AuthResponse, PolicyDocument, APIGatewaySimpleAuthorizerResult } from 'aws-lambda';
+import { CognitoJwtVerifier } from 'aws-jwt-verify';
 const COGNITO_USERPOOL_ID = process.env.COGNITO_USERPOOL_ID;
 const COGNITO_WEB_CLIENT_ID = process.env.COGNITO_WEB_CLIENT_ID;
 
 
+// const jwtVerifier = CognitoJwtVerifier.create({
+//     userPoolId: COGNITO_USERPOOL_ID,
+//     tokenUse: 'id',
+//     clientId: COGNITO_WEB_CLIENT_ID,
+
+// });
 const jwtVerifier = CognitoJwtVerifier.create({
-    userPoolId: COGNITO_USERPOOL_ID,
-    tokenUse: 'id',
+    userPoolId: COGNITO_USERPOOL_ID!,
     clientId: COGNITO_WEB_CLIENT_ID,
+    tokenUse: 'id',
+})
 
-});
-
-const generatePolicy = (principalId, effect, resource) => {
-    var authResponse = {};
+const generatePolicy = (principalId, effect, resource): AuthResponse => {
+    var authResponse = {} as AuthResponse;
     authResponse.principalId = principalId;
     if (effect && resource) {
         let policyDocument = {
@@ -33,7 +39,7 @@ const generatePolicy = (principalId, effect, resource) => {
     return authResponse;
 };
 
-exports.handler = async (event, context, callback) => {
+export const handler = async (event: APIGatewayTokenAuthorizerEvent, context: Context, cb: any) => {
 
     // lambda authorizer code goes here
     var token = event.authorizationToken;
@@ -45,11 +51,13 @@ exports.handler = async (event, context, callback) => {
     console.log(genericResource);
     console.log(token);
     try {
-        const payload = await jwtVerifier.verify(token);
+        const payload = await jwtVerifier.verify(token,{
+            clientId: COGNITO_WEB_CLIENT_ID!,
+        } );
         console.log(payload);
-        callback(null, generatePolicy(payload.username, 'Allow', genericResource));
+        cb(null, generatePolicy(payload.username, 'Allow', genericResource));
     } catch (err) {
         console.log(err);
-        callback('Unauthorized');
+        cb('Unauthorized');
     }
 }

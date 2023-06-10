@@ -1,12 +1,14 @@
 'use strict';
 
-const {
+import {
   DynamoDBClient, 
   PutItemCommand,
   UpdateItemCommand,
   DeleteItemCommand,
-  ScanCommand
-} = require('@aws-sdk/client-dynamodb');
+  ScanCommand,
+  UpdateItemCommandInput
+} from '@aws-sdk/client-dynamodb'
+import { APIGatewayEvent, Context, APIGatewayProxyCallback } from 'aws-lambda';
 
 const client = new DynamoDBClient({ region: 'us-east-1' });
 
@@ -19,10 +21,10 @@ const send = (statusCode, data) => {
   };
 };
 
-module.exports.createNote = async (event) => {
-
+export const createNote = async (event: APIGatewayEvent, context: Context, cb: APIGatewayProxyCallback) => {
+  
   try {
-    let data = JSON.parse(event.body);
+    let data = JSON.parse(event.body!);
     let params = {
       TableName: NOTES_TABLE_NAME,
       Item: {
@@ -34,22 +36,24 @@ module.exports.createNote = async (event) => {
     };
     const response = await client.send(new PutItemCommand(params));
 
-    return send(200, response);
+    // return send(200, response);
+    cb(null, send(200, response));
   } catch (err) {
     console.log(err);
-    return send(500, err);
+    cb(null, send(500, err));
+
   }
 };
 
-module.exports.updateNote = async (event) => {
-  let notesId = event.pathParameters.id;
+export const updateNote = async (event: APIGatewayEvent, context: Context, cb: APIGatewayProxyCallback) => {
+  let notesId = event.pathParameters?.id
   
   try {
-    let data = JSON.parse(event.body);
-    const params = {
+    let data = JSON.parse(event.body!);
+    const params: UpdateItemCommandInput = {
       TableName: NOTES_TABLE_NAME,
       Key: {
-        notesId: { S: notesId}
+        notesId: { S: notesId as string}
       },
       UpdateExpression: 'set #title = :title, #content = :content',
       ExpressionAttributeNames: {
@@ -64,41 +68,41 @@ module.exports.updateNote = async (event) => {
       ReturnValues: 'UPDATED_NEW'
     };
     const response = await client.send(new UpdateItemCommand(params));
-    return send(200, response);
+    cb(null, send(200, response));
   } catch (err) {
     console.log(err);
-    return send(500, err);
+    cb(null, send(500, err));
   }
 };
 
-module.exports.deleteNote = async (event) => {
-  let noteId = event.pathParameters.id;
+export const deleteNote = async (event: APIGatewayEvent, context: Context, cb: APIGatewayProxyCallback) => {
+  let notesId = event.pathParameters?.id;
   try {
     const params = {
       TableName: NOTES_TABLE_NAME,
       Key: {
-        notesId: { S: noteId}
+        notesId: { S: notesId as string}
       },
       ConditionExpression: 'attribute_exists(notesId)'
     };
     const response = await client.send(new DeleteItemCommand(params));
-    return send(200, response);
+    cb(null, send(200, response));
   } catch (err) {
     console.log(err);
-    return send(500, err);
+    cb(null, send(500, err));
   }
 };
 
-module.exports.getAllNotes = async (event) => {
+export const getAllNotes = async (event: APIGatewayEvent, context: Context, cb: APIGatewayProxyCallback) => {
   console.log(JSON.stringify(event));
   try {
     const params = {
       TableName: NOTES_TABLE_NAME
     };
     const response = await client.send(new ScanCommand(params));
-    return send(200, response);
+    cb(null, send(200, response));
   } catch (err) {
     console.log(err);
-    return send(500, err);
+    cb(null, send(500, err));
   }
 };
